@@ -1,0 +1,5 @@
+setuptools
+disutils
+wheel
+tqdm
+requests
