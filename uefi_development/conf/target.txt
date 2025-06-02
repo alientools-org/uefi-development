@@ -1,0 +1,4 @@
+ACTIVE_PLATFORM       = MdePkg/MdePkg.dsc
+TARGET_ARCH           = X64
+TOOL_CHAIN_TAG        = GCC5
+BUILD_RULE_CONF       = $(EDK_TOOLS_PATH)/BuildRule/GccRules.mk
