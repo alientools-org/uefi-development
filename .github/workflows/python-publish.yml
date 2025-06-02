@@ -1,9 +1,11 @@
 name: Python package
 
 on:
+  workflow_dispatch:
   push:
     tags:
-      - 'v*.*.*'   # z.B. v1.2.3 für Releases
+      - 'v*.*.*'
+
 
 jobs:
   build-and-publish:
