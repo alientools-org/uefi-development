@@ -35,6 +35,10 @@ def clone_edk2(target_dir: Path):
     run(["git", "pull"], cwd=str(target_dir))
 
 
+def build(target_dir: Path):
+    print("Building Packages !!!")
+    run(["build"], cwd=str(target_dir))
+
 def write_target_txt(edk_dir: Path, arch: str):
     conf_dir = edk_dir / "Conf"
     conf_dir.mkdir(parents=True, exist_ok=True)
@@ -74,6 +78,7 @@ def build_edk2(edk_dir: Path, build_target: str):
     run(full_cmd, shell=True)
 
 
+
 def main():
     args = parse_args()
 
@@ -90,6 +95,7 @@ def main():
     clone_edk2(edk2_dir)
     write_target_txt(edk2_dir, args.arch)
     build_edk2(edk2_dir, args.build)
+    build(edk2_dir)
 
 
 if __name__ == "__main__":
