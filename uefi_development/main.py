@@ -1,13 +1,25 @@
 #!/usr/bin/env python3
 import argparse
-import subprocess
 import sys
 import os
-import re
+import re 
+import pathlib
+import subprocess
+import shlex
+import logging, coloredlogs
+import tqdm
+
+
+
+from subprocess import Popen, PIPE, STDOUT
 from pathlib import Path
-from time import sleep
+
+
 
 from .utils import run
+
+
+
 
 GIT_URL = "https://github.com/tianocore/edk2.git"
 
@@ -24,75 +36,52 @@ def parse_args():
     return parser.parse_args()
 
 
-def git_clone_with_progress(repo_url: str, target_dir: Path):
-    """
-    Klont ein Git-Repository mit Fortschrittsanzeige.
-    Wenn das Zielverzeichnis bereits existiert, wird der Klon übersprungen.
-    """
-    if target_dir.exists():
-        print(f"[INFO] Zielverzeichnis '{target_dir}' existiert bereits. Klonen wird übersprungen.")
-        return
 
-    print(f"[INFO] Klone {repo_url} nach {target_dir} ...")
 
-    process = subprocess.Popen(
-        ["git", "clone", "--progress", repo_url, str(target_dir)],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        bufsize=1,
-    )
 
-    spinner = ['|', '/', '-', '\\']
-    spin_idx = 0
-    progress_regex = re.compile(r"Receiving objects:\s+(\d+)%")
+def clone(repo_url: str, target_dir: Path):
+    success = clone_edk2(repo_url, target_dir)
+    if success:
+        print("Repository ist bereit.")
+    else:
+        print("Fehler beim Klonen oder Aktualisieren.")
 
+
+
+def clone_edk2(git_url: str, target_dir: Path) -> bool:
     try:
-        for line in process.stdout:
-            line = line.strip()
-            match = progress_regex.search(line)
-            if match:
-                percent = int(match.group(1))
-                bar = ('█' * (percent // 2)).ljust(50)
-                sys.stdout.write(f"\r[CLONE] [{bar}] {percent}%")
-                sys.stdout.flush()
-            else:
-                sys.stdout.write(f"\r{spinner[spin_idx]} {line[:80]}")
-                sys.stdout.flush()
-                spin_idx = (spin_idx + 1) % len(spinner)
-            sleep(0.02)  # optional für sanfte Darstellung
-
-    except KeyboardInterrupt:
-        process.kill()
-        print("\n[ABBRUCH] Vorgang manuell abgebrochen.")
-        sys.exit(1)
-
-    process.wait()
-    print("\n[INFO] Git-Clone abgeschlossen.")
-
-    if process.returncode != 0:
-        raise subprocess.CalledProcessError(process.returncode, ["git", "clone", repo_url, str(target_dir)])
-
-
-def clone_edk2(target_dir: Path):
-    if target_dir.exists():
-        print(f"[INFO] Zielverzeichnis '{target_dir}' existiert bereits. Klonen wird übersprungen.")
-        return
-
-    print("[INFO] Klone EDK II Repository...")
-    try:
-        run(["git", "clone", GIT_URL, str(target_dir)])
+        if target_dir.exists() and target_dir.is_dir():
+            print(f"[INFO] Verzeichnis '{target_dir}' existiert bereits.")
+            print("[INFO] Aktualisiere Submodule...")
+            subprocess.run(
+                ["git", "submodule", "update", "--init", "--recursive"],
+                cwd=str(target_dir),
+                check=True
+            )
+        else:
+            print(f"[INFO] Klone Repository {git_url} nach {target_dir} ...")
+            subprocess.run(["git", "clone", git_url, str(target_dir)], check=True)
+            print("[INFO] Aktualisiere Submodule nach Klonen...")
+            subprocess.run(
+                ["git", "submodule", "update", "--init", "--recursive"],
+                cwd=str(target_dir),
+                check=True
+            )
+        return True
     except subprocess.CalledProcessError as e:
-        print(f"[ERROR] Git-Clone fehlgeschlagen: {e}")
-        print("[HINWEIS] Überprüfe die Netzwerkverbindung oder die Zielverzeichnisrechte.")
-        sys.exit(1)
+        print(f"[ERROR] Git-Befehl fehlgeschlagen: {e}")
+        return False
 
+
+
+def initialise_submodules(target_dir: Path):
     print("[INFO] Initialisiere und aktualisiere Submodule...")
-    try:
-        run(["git", "submodule", "update", "--init", "--recursive"], cwd=str(target_dir))
-    except subprocess.CalledProcessError as e:
-        print(f"[ERROR] Submodule-Update fehlgeschlagen: {e}")
-        sys.exit(1)
+    run(["git", "pull"], cwd=str(target_dir))
+    run(["git", "submodule", "update", "--init", "--recursive"], cwd=str(target_dir))
+    run(["git", "pull"], cwd=str(target_dir))
+
+
+
 
 
 
@@ -109,6 +98,29 @@ BUILD_RULE_CONF       = $(EDK_TOOLS_PATH)/BuildRule/GccRules.mk
     print(f"[INFO] target.txt geschrieben: {target_txt}")
 
 
+
+
+def build(edk_dir: Path):
+    edksetup = edk_dir / "edksetup.sh"
+    if not edksetup.exists():
+        print("[ERROR] edksetup.sh nicht gefunden!")
+        sys.exit(1)
+
+    print("[INFO] Setze Build-Umgebung auf...")
+
+    commands = [
+        f"cd {edk_dir}",
+        ". ./edksetup.sh",
+        "build"
+    ]
+
+    full_cmd = " && ".join(commands)
+    print(f"[INFO] Baue EDK II mit: {full_cmd}")
+
+    run(full_cmd, shell=True)
+
+
+
 def build_edk2(edk_dir: Path, build_target: str):
     edksetup = edk_dir / "edksetup.sh"
     if not edksetup.exists():
@@ -117,38 +129,25 @@ def build_edk2(edk_dir: Path, build_target: str):
 
     print("[INFO] Setze Build-Umgebung auf...")
 
-    # Shell-Befehl zusammenbauen
+    commands = [
+        f"cd {edk_dir}",
+        ". ./edksetup.sh BaseTools",
+        "make -C BaseTools",
+        "build"
+    ]
+
     if build_target.lower() == "all":
-        build_cmd = "build"
+        commands.append("build")
     else:
-        build_cmd = f"build -p MdePkg/MdePkg.dsc -m {build_target}"
+        commands.append(f"build -p MdePkg/MdePkg.dsc -m {build_target}")
 
-    cmd = f"""
-    cd {edk_dir} && \
-    . ./edksetup.sh BaseTools && \
-    make -C BaseTools && \
-    {build_cmd}
-    """
+    full_cmd = " && ".join(commands)
+    print(f"[INFO] Baue EDK II mit: {full_cmd}")
 
-    print(f"[INFO] Starte Build mit: {build_cmd}")
+    run(full_cmd, shell=True)
 
-    # Verwende subprocess direkt für vollständige Kontrolle (nicht run wrapper)
-    process = subprocess.Popen(
-        cmd,
-        shell=True,
-        executable="/bin/bash",
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        bufsize=1
-    )
 
-    for line in process.stdout:
-        print(line, end='')
 
-    process.wait()
-    if process.returncode != 0:
-        raise subprocess.CalledProcessError(process.returncode, cmd)
 
 
 def main():
@@ -164,10 +163,10 @@ def main():
 
     edk2_dir = workspace / "edk2"
 
-    #clone_edk2(edk2_dir)
-    git_clone_with_progress(GIT_URL, edk2_dir)
+    clone(GIT_URL, edk2_dir)
     write_target_txt(edk2_dir, args.arch)
     build_edk2(edk2_dir, args.build)
+    build(edk2_dir)
 
 
 if __name__ == "__main__":

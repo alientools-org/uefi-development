@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: uefi_development
+Version: 0.5.4
+Summary: A Module to easily create a uefi development enviroment!
+Home-page: https://github.com/alientools-org/uefi-development
+Author: hexzhen3x7
+Author-email: hexzhen3x7 <hexzhen3x7@blackzspace.de>
+License: MIT
+Project-URL: Homepage, https://github.com/alientools-org/uefi_development
+Project-URL: Repository, https://github.com/alientools-org/uefi_developmentg
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: requests>=2.0
+Requires-Dist: tqdm
+Dynamic: author
+Dynamic: home-page
+Dynamic: requires-python
+
+# uefi-development

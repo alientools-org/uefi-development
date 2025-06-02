@@ -3,3 +3,4 @@ disutils
 wheel
 tqdm
 requests
+coloredlogs
