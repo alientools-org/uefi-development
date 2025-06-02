@@ -23,7 +23,7 @@ setup(
     include_package_data=True,
     entry_points={
         "console_scripts": [
-             "uefi-development=uefi_development:main",  # Falls CLI-Tool
+             "uefi_development=uefi_development:main",  # Falls CLI-Tool
         ],
     },
 )
