@@ -22,8 +22,8 @@ def clone_edk2(target_dir):
         print(f"[INFO] Zielverzeichnis '{target_dir}' existiert bereits. Klonen wird übersprungen.")
         return
     print("[INFO] Klone EDK II Repository...")
-    run("git", "clone", GIT_URL, str(target_dir))
-    #subprocess.run(["git", "clone", GIT_URL, str(target_dir)], check=True)
+    #run("git", "clone", GIT_URL, str(target_dir))
+    subprocess.run(["git", "clone", GIT_URL, str(target_dir)], check=True)
 
 def write_target_txt(edk_dir, arch):
     conf_dir = edk_dir / "Conf"
