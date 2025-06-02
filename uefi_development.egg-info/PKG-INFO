@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: uefi_development
-Version: 0.2.0
+Version: 0.4.0
 Summary: A Module to easily create a uefi development enviroment!
 Home-page: https://github.com/alientools-org/uefi-development
 Author: hexzhen3x7
