@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+setup.py
+uefi_development.egg-info/PKG-INFO
+uefi_development.egg-info/SOURCES.txt
+uefi_development.egg-info/dependency_links.txt
+uefi_development.egg-info/entry_points.txt
+uefi_development.egg-info/requires.txt
+uefi_development.egg-info/top_level.txt
