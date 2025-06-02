@@ -22,8 +22,11 @@ def clone_edk2(target_dir):
         print(f"[INFO] Zielverzeichnis '{target_dir}' existiert bereits. Klonen wird übersprungen.")
         return
     print("[INFO] Klone EDK II Repository...")
-    #run("git", "clone", GIT_URL, str(target_dir))
     subprocess.run(["git", "clone", GIT_URL, str(target_dir)], check=True)
+    print("[INFO] Initialisiere und aktualisiere Submodule...")
+    subprocess.run(["git", "pull"], cwd=str(target_dir), check=True)
+    subprocess.run(["git", "submodule", "update", "--init", "--recursive"], cwd=str(target_dir), check=True)
+    subprocess.run(["git", "pull"], cwd=str(target_dir), check=True)
 
 def write_target_txt(edk_dir, arch):
     conf_dir = edk_dir / "Conf"
@@ -62,32 +65,6 @@ def build_edk2(edk_dir, build_target):
 
 
 
-
-def build_edk(edk_dir, build_target):
-    edksetup = edk_dir / "edksetup.sh"
-    if not edksetup.exists():
-        print("[ERROR] edksetup.sh nicht gefunden!")
-        sys.exit(1)
-
-    print("[INFO] Setze Build-Umgebung auf...")
-
-    commands = [
-        f"cd {edk_dir}",
-        ". ./edksetup.sh BaseTools",
-        "make -C BaseTools"
-    ]
-
-    if build_target.lower() == "all":
-        commands.append("build")
-    else:
-        commands.append(f"build -p MdePkg/MdePkg.dsc -m {build_target}")
-
-    full_cmd = " && ".join(commands)
-
-    print(f"[INFO] Baue EDK II mit: {full_cmd}")
-    #subprocess.run(full_cmd, shell=True, executable="/bin/bash", check=True)
-    for command in commands:
-        run(command)
 
 
 

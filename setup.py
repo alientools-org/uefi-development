@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="uefi_development",               # Name des Pakets
-    version="0.1.5",                      # Version
+    version="0.1.6",                      # Version
     author="hexzhen3x7",
     author_email="hexzhen3x7@blackzspace.de",
     description="This module is for easily creating a uefi sdk development enviroment!",
