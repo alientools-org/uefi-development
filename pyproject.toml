@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uefi_development"
+version = "0.1.0"
+description = "A Module to easily create a uefi development enviroment!"
+readme = "README.md"
+requires-python = ">=3.6"
+license = {text = "MIT"}
+authors = [
+    {name = "hexzhen3x7", email = "hexzhen3x7@blackzspace.de"}
+]
+dependencies = [
+    "requests >=2.0",
+    "tqdm"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/alientools-org/uefi_development"
+"Repository" = "https://github.com/alientools-org/uefi_developmentg"
+
+[project.scripts]
+uefi_development = "uefi_development:main"
