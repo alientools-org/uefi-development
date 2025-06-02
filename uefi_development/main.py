@@ -37,7 +37,33 @@ BUILD_RULE_CONF       = $(EDK_TOOLS_PATH)/BuildRule/GccRules.mk
 """)
     print(f"[INFO] target.txt geschrieben: {target_txt}")
 
+
+
 def build_edk2(edk_dir, build_target):
+    edksetup = edk_dir / "edksetup.sh"
+    if not edksetup.exists():
+        print("[ERROR] edksetup.sh nicht gefunden!")
+        sys.exit(1)
+
+    print("[INFO] Setze Build-Umgebung auf...")
+
+    commands = [
+        ". ./edksetup.sh BaseTools",
+        "make -C BaseTools"
+    ]
+
+    if build_target.lower() == "all":
+        commands.append("build")
+    else:
+        commands.append(f"build -p MdePkg/MdePkg.dsc -m {build_target}")
+
+    for command in commands:
+        run(command, cwd=str(edk_dir))
+
+
+
+
+def build_edk(edk_dir, build_target):
     edksetup = edk_dir / "edksetup.sh"
     if not edksetup.exists():
         print("[ERROR] edksetup.sh nicht gefunden!")

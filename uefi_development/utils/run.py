@@ -1,14 +1,16 @@
 import subprocess
-import sys
 
-def run(*commands):
+def run(*commands, cwd=None):
     """
     Führt eine Liste von Befehlen oder mehrere einzelne Befehle nacheinander aus
     und gibt die Ausgabe in Echtzeit auf der Konsole aus.
 
+    Optional kann das Arbeitsverzeichnis mit cwd angegeben werden.
+
     Beispiele:
-        run_commands(["ls", "pwd"])
-        run_commands("ls", "pwd")
+        run(["ls", "pwd"])
+        run("ls", "pwd")
+        run("ls", cwd="/tmp")
     """
     if len(commands) == 1 and isinstance(commands[0], list):
         cmds = commands[0]
@@ -18,14 +20,15 @@ def run(*commands):
     for cmd in cmds:
         print(f"[INFO] Führe aus: {cmd}")
 
-        # Für String-Kommandos (Shell) vs Listen-Kommandos
         if isinstance(cmd, str):
             process = subprocess.Popen(
-                cmd, shell=True,
+                cmd,
+                shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
-                bufsize=1
+                bufsize=1,
+                cwd=cwd
             )
         else:
             process = subprocess.Popen(
@@ -33,10 +36,10 @@ def run(*commands):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
-                bufsize=1
+                bufsize=1,
+                cwd=cwd
             )
 
-        # Echtzeit-Ausgabe der Zeilen
         for line in process.stdout:
             print(line, end='')
 
