@@ -4,7 +4,7 @@ import subprocess
 import sys
 import os
 from pathlib import Path
-from .utils import run_commands
+from .utils import run
 
 GIT_URL = "https://github.com/tianocore/edk2.git"
 
@@ -22,7 +22,8 @@ def clone_edk2(target_dir):
         print(f"[INFO] Zielverzeichnis '{target_dir}' existiert bereits. Klonen wird übersprungen.")
         return
     print("[INFO] Klone EDK II Repository...")
-    subprocess.run(["git", "clone", GIT_URL, str(target_dir)], check=True)
+    run("git", "clone", GIT_URL, str(target_dir))
+    #subprocess.run(["git", "clone", GIT_URL, str(target_dir)], check=True)
 
 def write_target_txt(edk_dir, arch):
     conf_dir = edk_dir / "Conf"
@@ -62,7 +63,7 @@ def build_edk2(edk_dir, build_target):
     for command in commands:
         run(command)
 
-        
+
 
 def main():
     args = parse_args()

@@ -1,7 +1,7 @@
 import subprocess
 import sys
 
-def run_commands(*commands):
+def run(*commands):
     """
     Führt eine Liste von Befehlen oder mehrere einzelne Befehle nacheinander aus
     und gibt die Ausgabe in Echtzeit auf der Konsole aus.
