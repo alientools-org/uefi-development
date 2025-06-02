@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+setup.py
+uefi_development/__init__.py
+uefi_development/__main__.py
+uefi_development/main.py
+uefi_development.egg-info/PKG-INFO
+uefi_development.egg-info/SOURCES.txt
+uefi_development.egg-info/dependency_links.txt
+uefi_development.egg-info/entry_points.txt
+uefi_development.egg-info/requires.txt
+uefi_development.egg-info/top_level.txt
+uefi_development/utils/__init__.py
+uefi_development/utils/run.py

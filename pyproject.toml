@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "uefi_development"
-version = "0.1.0"
+version = "0.1.2"
 description = "A Module to easily create a uefi development enviroment!"
 readme = "README.md"
 requires-python = ">=3.6"
