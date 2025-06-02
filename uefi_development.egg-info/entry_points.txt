@@ -1,2 +1,0 @@
-[console_scripts]
-uefi_development = uefi_development:main
