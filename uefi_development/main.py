@@ -4,6 +4,7 @@ import subprocess
 import sys
 import os
 from pathlib import Path
+from .utils import run_commands
 
 GIT_URL = "https://github.com/tianocore/edk2.git"
 
@@ -57,7 +58,11 @@ def build_edk2(edk_dir, build_target):
     full_cmd = " && ".join(commands)
 
     print(f"[INFO] Baue EDK II mit: {full_cmd}")
-    subprocess.run(full_cmd, shell=True, executable="/bin/bash", check=True)
+    #subprocess.run(full_cmd, shell=True, executable="/bin/bash", check=True)
+    for command in commands:
+        run(command)
+
+        
 
 def main():
     args = parse_args()
